@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PaceIQ - Training Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#390c00",
+              "surface-container-high": "#e8e8e8",
+              "tertiary-fixed-dim": "#a4c9ff",
+              "on-tertiary": "#ffffff",
+              "surface-dim": "#dadada",
+              "secondary-fixed-dim": "#ffb59c",
+              "surface-tint": "#ab3500",
+              "inverse-primary": "#ffb59d",
+              "primary-container": "#d14300",
+              "on-tertiary-fixed-variant": "#004883",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e2",
+              "on-primary-fixed": "#390c00",
+              "inverse-on-surface": "#f1f1f1",
+              "tertiary": "#005da8",
+              "on-primary": "#ffffff",
+              "surface-container-low": "#f3f3f3",
+              "on-primary-fixed-variant": "#832700",
+              "secondary-container": "#fe6529",
+              "surface": "#f9f9f9",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#fffbff",
+              "on-secondary-container": "#591800",
+              "outline": "#907065",
+              "secondary-fixed": "#ffdbcf",
+              "background": "#f9f9f9",
+              "surface-bright": "#f9f9f9",
+              "outline-variant": "#e5beb2",
+              "on-surface": "#1a1c1c",
+              "on-surface-variant": "#5c4037",
+              "on-secondary-fixed-variant": "#822700",
+              "surface-container-highest": "#e2e2e2",
+              "secondary": "#ab3600",
+              "primary": "#a73400",
+              "on-background": "#1a1c1c",
+              "error": "#ba1a1a",
+              "surface-container": "#eeeeee",
+              "primary-fixed": "#ffdbd0",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#ffb59d",
+              "on-tertiary-container": "#fdfcff",
+              "on-tertiary-fixed": "#001c39",
+              "inverse-surface": "#2f3131",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "tertiary-fixed": "#d4e3ff",
+              "tertiary-container": "#0076d2"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        background-color: #f9f9f9;
+        color: #1a1c1c;
+      }
+    </style>
+</head>
+<body class="font-body selection:bg-primary-container/30">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md flex justify-between items-center w-full px-6 h-14 transition-all duration-200">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-tighter text-zinc-900 dark:text-zinc-100">PaceIQ</span>
+<nav class="hidden md:flex items-center gap-6 ml-8">
+<a class="text-zinc-500 dark:text-zinc-400 font-medium text-sm hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 px-2 py-1 rounded transition-colors" href="#">Share</a>
+<a class="text-zinc-500 dark:text-zinc-400 font-medium text-sm hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 px-2 py-1 rounded transition-colors" href="#">Chat</a>
+<a class="text-zinc-500 dark:text-zinc-400 font-medium text-sm hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 px-2 py-1 rounded transition-colors" href="#">Updates</a>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">search</span>
+<input class="pl-8 pr-4 py-1.5 bg-zinc-100 dark:bg-zinc-900 border-none rounded-lg text-xs w-48 focus:ring-1 focus:ring-primary transition-all" placeholder="Search..." type="text"/>
+</div>
+<span class="material-symbols-outlined text-zinc-500 hover:bg-zinc-200/50 p-1.5 rounded-lg cursor-pointer transition-colors">star</span>
+<span class="material-symbols-outlined text-zinc-500 hover:bg-zinc-200/50 p-1.5 rounded-lg cursor-pointer transition-colors">more_vert</span>
+</div>
+</header>
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-zinc-50 dark:bg-zinc-900 flex flex-col py-8 z-40 hidden md:flex">
+<div class="px-6 mb-10 mt-10">
+<h1 class="text-lg font-black tracking-widest uppercase text-[#a73400]">PaceIQ</h1>
+<p class="text-[10px] font-bold text-zinc-400 tracking-wider">The Kinetic Architect</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#a73400] dark:text-[#d14300] font-bold border-r-4 border-[#a73400] bg-zinc-200/50 dark:bg-zinc-800/50 transition-all text-sm" href="#">
+<span class="material-symbols-outlined text-xl">calendar_today</span> Training Log
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">smart_toy</span> Coaching Chat
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">emoji_events</span> Race Planner
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">settings</span> Settings
+            </a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-primary/10 active:scale-95 transition-all">
+                Start Run
+            </button>
+<div class="mt-6 flex flex-col gap-1 border-t border-zinc-200 dark:border-zinc-800 pt-4">
+<a class="flex items-center gap-3 px-4 py-1.5 text-xs text-zinc-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">help</span> Help
+                </a>
+<a class="flex items-center gap-3 px-4 py-1.5 text-xs text-zinc-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">shield</span> Privacy
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-20 px-6 pb-20 min-h-screen">
+<div class="max-w-6xl mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h2 class="text-5xl font-black tracking-tighter text-on-surface mb-2">Training Log 📅</h2>
+<p class="text-on-surface-variant text-sm font-medium opacity-70">Architecture of performance. Every mile is a blueprint.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high rounded-xl text-primary font-bold text-sm hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined text-lg">filter_list</span> Filter
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high rounded-xl text-primary font-bold text-sm hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined text-lg">sort</span> Sort
+                    </button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold text-sm shadow-xl shadow-primary/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg">add</span> New Log
+                    </button>
+</div>
+</div>
+<!-- Database Controls -->
+<div class="flex items-center gap-6 mb-2 text-sm border-b border-surface-container-highest overflow-x-auto pb-px">
+<button class="px-2 py-3 border-b-2 border-primary text-on-surface font-bold flex items-center gap-2 whitespace-nowrap">
+<span class="material-symbols-outlined text-lg">table_rows</span> Table View
+                </button>
+<button class="px-2 py-3 text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 whitespace-nowrap">
+<span class="material-symbols-outlined text-lg">grid_view</span> Gallery
+                </button>
+<button class="px-2 py-3 text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 whitespace-nowrap">
+<span class="material-symbols-outlined text-lg">calendar_month</span> Calendar
+                </button>
+<div class="ml-auto flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-on-surface">search</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-on-surface">more_horiz</span>
+</div>
+</div>
+<!-- Training Log Table (Notion Aesthetic) -->
+<div class="bg-surface-container-lowest overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-container-high">
+<th class="px-4 py-3 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest w-40">Date</th>
+<th class="px-4 py-3 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest w-48">Run Type</th>
+<th class="px-4 py-3 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Distance (mi)</th>
+<th class="px-4 py-3 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Time</th>
+<th class="px-4 py-3 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Subjective Feel</th>
+<th class="px-4 py-3 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Injury Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Row 1 -->
+<tr class="group hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-4 py-4 text-sm font-medium text-on-surface">Oct 24, 2023</td>
+<td class="px-4 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#ffdbd0] text-[#832700]">
+                                    Long Run
+                                </span>
+</td>
+<td class="px-4 py-4">
+<span class="text-lg font-black tracking-tight text-primary">14.2</span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase ml-1">mi</span>
+</td>
+<td class="px-4 py-4 text-sm font-medium font-mono text-on-surface">01:54:12</td>
+<td class="px-4 py-4 text-sm text-on-surface-variant italic">"Felt strong, pace held steady through the hills."</td>
+<td class="px-4 py-4">
+<span class="flex items-center gap-2 text-[11px] font-bold text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span> None
+                                </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-4 py-4 text-sm font-medium text-on-surface">Oct 22, 2023</td>
+<td class="px-4 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
+                                    Recovery
+                                </span>
+</td>
+<td class="px-4 py-4">
+<span class="text-lg font-black tracking-tight text-primary">4.0</span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase ml-1">mi</span>
+</td>
+<td class="px-4 py-4 text-sm font-medium font-mono text-on-surface">00:38:45</td>
+<td class="px-4 py-4 text-sm text-on-surface-variant italic">"Tired legs from yesterday's lift."</td>
+<td class="px-4 py-4">
+<span class="flex items-center gap-2 text-[11px] font-bold text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span> Left Knee: 2/10
+                                </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-4 py-4 text-sm font-medium text-on-surface">Oct 20, 2023</td>
+<td class="px-4 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700">
+                                    Intervals
+                                </span>
+</td>
+<td class="px-4 py-4">
+<span class="text-lg font-black tracking-tight text-primary">8.5</span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase ml-1">mi</span>
+</td>
+<td class="px-4 py-4 text-sm font-medium font-mono text-on-surface">01:02:10</td>
+<td class="px-4 py-4 text-sm text-on-surface-variant italic">"Hit all splits. Heart rate recovery was exceptional."</td>
+<td class="px-4 py-4">
+<span class="flex items-center gap-2 text-[11px] font-bold text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span> None
+                                </span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-4 py-4 text-sm font-medium text-on-surface">Oct 18, 2023</td>
+<td class="px-4 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
+                                    Recovery
+                                </span>
+</td>
+<td class="px-4 py-4">
+<span class="text-lg font-black tracking-tight text-primary">5.2</span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase ml-1">mi</span>
+</td>
+<td class="px-4 py-4 text-sm font-medium font-mono text-on-surface">00:46:30</td>
+<td class="px-4 py-4 text-sm text-on-surface-variant italic">"Easy spin around the park. RPE 2/10."</td>
+<td class="px-4 py-4">
+<span class="flex items-center gap-2 text-[11px] font-bold text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span> None
+                                </span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="group hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-4 py-4 text-sm font-medium text-on-surface">Oct 17, 2023</td>
+<td class="px-4 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#ffdbd0] text-[#832700]">
+                                    Tempo
+                                </span>
+</td>
+<td class="px-4 py-4">
+<span class="text-lg font-black tracking-tight text-primary">10.0</span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase ml-1">mi</span>
+</td>
+<td class="px-4 py-4 text-sm font-medium font-mono text-on-surface">01:12:05</td>
+<td class="px-4 py-4 text-sm text-on-surface-variant italic">"Consistent threshold effort. Mental focus was 10/10."</td>
+<td class="px-4 py-4">
+<span class="flex items-center gap-2 text-[11px] font-bold text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span> None
+                                </span>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Empty State/Footer Action -->
+<div class="p-4 border-t border-surface-container-high group cursor-pointer hover:bg-surface-container-low transition-all">
+<div class="flex items-center gap-2 text-on-surface-variant font-medium text-sm">
+<span class="material-symbols-outlined text-lg">add</span> New
+                    </div>
+</div>
+</div>
+<!-- Bento Stats Grid (Editorial Polish) -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 bg-surface-container-lowest p-8 rounded-xl relative overflow-hidden flex flex-col justify-between min-h-[240px]">
+<div class="relative z-10">
+<p class="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant mb-4">Volume Architect</p>
+<h3 class="text-4xl font-black tracking-tighter text-on-surface max-w-xs">Your consistency is up 14% this month.</h3>
+</div>
+<div class="relative z-10 mt-8">
+<button class="bg-primary text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                            View Analysis
+                        </button>
+</div>
+<!-- Decorative Element -->
+<div class="absolute -right-12 -bottom-12 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl"></div>
+</div>
+<div class="bg-primary-container p-8 rounded-xl flex flex-col justify-center text-white relative overflow-hidden">
+<div class="relative z-10">
+<p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-2">Next Target</p>
+<h4 class="text-3xl font-black tracking-tighter mb-4">Berlin Marathon</h4>
+<div class="h-2 w-full bg-white/20 rounded-full overflow-hidden">
+<div class="h-full bg-white w-3/4 rounded-full"></div>
+</div>
+<p class="text-[10px] mt-4 font-bold opacity-80">75% of training plan completed</p>
+</div>
+<!-- Texture -->
+<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+</div>
+</div>
+<!-- Detailed Insights Section -->
+<section class="mt-16 border-t border-surface-container pt-12">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-2xl font-black tracking-tighter text-on-surface">Weekly Distribution</h3>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-[10px] font-bold text-on-surface-variant">Last 7 Days</span>
+<span class="px-3 py-1 rounded-full text-[10px] font-bold text-on-surface-variant border border-surface-container">Last 30 Days</span>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<div class="p-6 bg-surface-container-low rounded-xl">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Total Miles</p>
+<span class="text-3xl font-black tracking-tight text-on-surface">42.8</span>
+</div>
+<div class="p-6 bg-surface-container-low rounded-xl">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Avg Pace</p>
+<span class="text-3xl font-black tracking-tight text-on-surface">7:42</span>
+</div>
+<div class="p-6 bg-surface-container-low rounded-xl">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Active Time</p>
+<span class="text-3xl font-black tracking-tight text-on-surface">5h 12m</span>
+</div>
+<div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-primary">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">AI Status</p>
+<span class="text-3xl font-black tracking-tight text-on-surface">Optimal</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Mobile Bottom Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-zinc-950 px-6 py-3 flex justify-between items-center z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<div class="flex flex-col items-center gap-1 text-[#a73400]">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] font-bold">Logs</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-zinc-400">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Home</span>
+</div>
+<div class="-mt-8">
+<button class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white shadow-xl shadow-primary/40">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="flex flex-col items-center gap-1 text-zinc-400">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-[10px] font-bold">Coach</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-zinc-400">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Profile</span>
+</div>
+</nav>
+</body></html>

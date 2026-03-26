@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Debug / scratch files
+test-agent.ts
+test-tools.ts
+
+# Internal planning docs
+paceiq_build_plan.docx
+
+# TypeScript cache
+*.tsbuildinfo
+
+# npm debug logs
+npm-debug.log*

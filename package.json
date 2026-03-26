@@ -1,0 +1,36 @@
+{
+  "name": "paceiq",
+  "version": "1.0.0",
+  "description": "AI Running Coach powered by Notion MCP — MLH × Notion MCP Challenge",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "setup": "node --loader ts-node/esm src/notion/setup.ts",
+    "sync": "node --loader ts-node/esm src/strava/sync.ts",
+    "start": "node --loader ts-node/esm src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.0",
+    "@langchain/langgraph": "^0.2.0",
+    "@langchain/openai": "^0.4.9",
+    "@notionhq/client": "^2.2.15",
+    "dotenv": "^16.0.0",
+    "ora": "^8.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "notion",
+    "mcp",
+    "running",
+    "ai-coach",
+    "strava",
+    "langchain"
+  ],
+  "license": "MIT"
+}

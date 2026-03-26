@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Race Strategy Planner | PaceIQ</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#390c00",
+              "surface-container-high": "#e8e8e8",
+              "tertiary-fixed-dim": "#a4c9ff",
+              "on-tertiary": "#ffffff",
+              "surface-dim": "#dadada",
+              "secondary-fixed-dim": "#ffb59c",
+              "surface-tint": "#ab3500",
+              "inverse-primary": "#ffb59d",
+              "primary-container": "#d14300",
+              "on-tertiary-fixed-variant": "#004883",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e2",
+              "on-primary-fixed": "#390c00",
+              "inverse-on-surface": "#f1f1f1",
+              "tertiary": "#005da8",
+              "on-primary": "#ffffff",
+              "surface-container-low": "#f3f3f3",
+              "on-primary-fixed-variant": "#832700",
+              "secondary-container": "#fe6529",
+              "surface": "#f9f9f9",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#fffbff",
+              "on-secondary-container": "#591800",
+              "outline": "#907065",
+              "secondary-fixed": "#ffdbcf",
+              "background": "#f9f9f9",
+              "surface-bright": "#f9f9f9",
+              "outline-variant": "#e5beb2",
+              "on-surface": "#1a1c1c",
+              "on-surface-variant": "#5c4037",
+              "on-secondary-fixed-variant": "#822700",
+              "surface-container-highest": "#e2e2e2",
+              "secondary": "#ab3600",
+              "primary": "#a73400",
+              "on-background": "#1a1c1c",
+              "error": "#ba1a1a",
+              "surface-container": "#eeeeee",
+              "primary-fixed": "#ffdbd0",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#ffb59d",
+              "on-tertiary-container": "#fdfcff",
+              "on-tertiary-fixed": "#001c39",
+              "inverse-surface": "#2f3131",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "tertiary-fixed": "#d4e3ff",
+              "tertiary-container": "#0076d2"
+            },
+            fontFamily: {
+              "headline": ["Inter", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .kinetic-gradient {
+        background: linear-gradient(135deg, #a73400 0%, #d14300 100%);
+      }
+      .glass-hud {
+        background: rgba(249, 249, 249, 0.8);
+        backdrop-filter: blur(20px);
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center w-full px-6 h-14 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md no-border bg-zinc-100/50 dark:bg-zinc-900/50 font-sans antialiased tracking-tight text-sm font-medium">
+<div class="text-xl font-bold tracking-tighter text-zinc-900 dark:text-zinc-100">PaceIQ</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-colors" href="#">Share</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-colors" href="#">Chat</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-colors" href="#">Updates</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-zinc-500 cursor-pointer">star</span>
+<span class="material-symbols-outlined text-zinc-500 cursor-pointer">more_vert</span>
+</div>
+</header>
+<!-- Side Navigation Bar (Desktop) -->
+<aside class="fixed left-0 top-0 h-full hidden md:flex flex-col py-8 w-64 bg-zinc-50 dark:bg-zinc-900 z-40">
+<div class="px-6 mb-10">
+<h1 class="text-lg font-black tracking-widest uppercase text-[#a73400]">PaceIQ</h1>
+<p class="text-[10px] text-on-surface-variant font-bold tracking-widest opacity-60">THE KINETIC ARCHITECT</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-sm font-medium">Training Log</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-sm font-medium">Coaching Chat</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#a73400] dark:text-[#d14300] font-bold border-r-4 border-[#a73400]" href="#">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="text-sm">Race Planner</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-4 space-y-4">
+<button class="w-full kinetic-gradient text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm shadow-[0px_10px_20px_rgba(167,52,0,0.15)] active:scale-95 transition-all">
+<span class="material-symbols-outlined">directions_run</span>
+                Start Run
+            </button>
+<div class="pt-4 flex flex-col gap-2">
+<a class="text-xs text-on-surface-variant flex items-center gap-2 px-2" href="#"><span class="material-symbols-outlined text-sm">help</span> Help</a>
+<a class="text-xs text-on-surface-variant flex items-center gap-2 px-2" href="#"><span class="material-symbols-outlined text-sm">shield</span> Privacy</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Stage -->
+<main class="md:ml-64 pt-20 pb-12 px-6 lg:px-12 max-w-6xl">
+<!-- Header Section -->
+<header class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-[3.5rem] font-bold tracking-[-0.03em] leading-none mb-2">Race Strategy 🏆</h2>
+<p class="text-on-surface-variant body-md max-w-lg">
+                        Architecting your peak performance. Use this space to define your race-day geometry, from metabolic pacing to elevation-aware splits.
+                    </p>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-4 py-1.5 bg-surface-container-high rounded-full text-xs font-bold tracking-wider text-secondary">PRE-RACE PHASE</span>
+<span class="px-4 py-1.5 bg-primary-container text-white rounded-full text-xs font-bold tracking-wider">LOCKED-IN</span>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Goal Setting & Tips -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Goal Setting Block -->
+<section class="bg-surface-container-lowest p-8 rounded-xl shadow-sm">
+<h3 class="text-xs font-bold tracking-widest uppercase text-on-surface-variant/60 mb-6">Target Goal</h3>
+<div class="space-y-6">
+<div class="border-b-2 border-surface-variant pb-1 focus-within:border-primary transition-all">
+<label class="text-[10px] uppercase font-black text-primary block mb-1">Event Name</label>
+<input class="w-full bg-transparent border-none p-0 text-xl font-bold tracking-tight focus:ring-0" type="text" value="Valencia Half Marathon"/>
+</div>
+<div class="border-b-2 border-surface-variant pb-1 focus-within:border-primary transition-all">
+<label class="text-[10px] uppercase font-black text-primary block mb-1">Goal Time</label>
+<input class="w-full bg-transparent border-none p-0 text-3xl font-bold tracking-tighter focus:ring-0" type="text" value="Sub-1:45:00"/>
+</div>
+<div class="pt-4">
+<div class="flex justify-between text-xs font-bold mb-2">
+<span class="text-on-surface-variant">Probability of Success</span>
+<span class="text-primary">82%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-[#FC5200] rounded-full" style="width: 82%"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Notion Style Callout -->
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-primary-container flex gap-4">
+<div class="text-2xl mt-1">💡</div>
+<div>
+<h4 class="font-bold text-sm mb-1">AI Coach Tip</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                            Based on your last three threshold sessions, your metabolic ceiling suggests a 1:43:20 is achievable if you maintain an RPE of 7 for the first 10km.
+                        </p>
+</div>
+</div>
+<!-- Fueling Card -->
+<section class="bg-surface-container-high/40 p-6 rounded-xl">
+<h3 class="text-xs font-bold tracking-widest uppercase mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">local_drink</span> Fueling Strategy
+                    </h3>
+<ul class="space-y-4">
+<li class="flex items-center justify-between">
+<span class="text-xs font-medium">Pre-Race Carbs</span>
+<span class="text-xs font-bold bg-white px-2 py-0.5 rounded">450g / day</span>
+</li>
+<li class="flex items-center justify-between">
+<span class="text-xs font-medium">Gel Cadence</span>
+<span class="text-xs font-bold bg-white px-2 py-0.5 rounded">Every 40 mins</span>
+</li>
+<li class="flex items-center justify-between">
+<span class="text-xs font-medium">Sodium Load</span>
+<span class="text-xs font-bold bg-white px-2 py-0.5 rounded">750mg / hr</span>
+</li>
+</ul>
+</section>
+</div>
+<!-- Right Column: Race Week & Map -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Race Week Plan -->
+<section class="bg-surface-container-lowest p-8 rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-2xl font-bold tracking-tight">Race Week Schedule</h3>
+<p class="text-sm text-on-surface-variant">Precision Taper Protocol</p>
+</div>
+<span class="material-symbols-outlined text-zinc-300 scale-150">auto_awesome</span>
+</div>
+<div class="grid grid-cols-7 gap-2">
+<!-- Mon -->
+<div class="text-center group">
+<span class="block text-[10px] font-black text-on-surface-variant/40 mb-2">MON</span>
+<div class="h-32 bg-surface-container-low rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high transition-colors border-b-4 border-transparent hover:border-primary-container/30">
+<span class="material-symbols-outlined text-sm opacity-40">bed</span>
+<span class="text-[10px] font-bold">Rest</span>
+</div>
+</div>
+<!-- Tue -->
+<div class="text-center group">
+<span class="block text-[10px] font-black text-on-surface-variant/40 mb-2">TUE</span>
+<div class="h-32 bg-surface-container-low rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high transition-colors border-b-4 border-transparent hover:border-primary-container/30">
+<span class="material-symbols-outlined text-sm text-primary">sprint</span>
+<span class="text-[10px] font-bold">6km EZ</span>
+</div>
+</div>
+<!-- Wed -->
+<div class="text-center group">
+<span class="block text-[10px] font-black text-on-surface-variant/40 mb-2">WED</span>
+<div class="h-32 bg-surface-container-low rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high transition-colors border-b-4 border-transparent hover:border-primary-container/30">
+<span class="material-symbols-outlined text-sm text-primary">speed</span>
+<span class="text-[10px] font-bold">Intervals</span>
+</div>
+</div>
+<!-- Thu -->
+<div class="text-center group">
+<span class="block text-[10px] font-black text-on-surface-variant/40 mb-2">THU</span>
+<div class="h-32 bg-surface-container-low rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high transition-colors border-b-4 border-transparent hover:border-primary-container/30">
+<span class="material-symbols-outlined text-sm opacity-40">self_improvement</span>
+<span class="text-[10px] font-bold">Mobility</span>
+</div>
+</div>
+<!-- Fri -->
+<div class="text-center group">
+<span class="block text-[10px] font-black text-on-surface-variant/40 mb-2">FRI</span>
+<div class="h-32 bg-surface-container-low rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high transition-colors border-b-4 border-transparent hover:border-primary-container/30">
+<span class="material-symbols-outlined text-sm text-primary">sprint</span>
+<span class="text-[10px] font-bold">4km EZ</span>
+</div>
+</div>
+<!-- Sat -->
+<div class="text-center group">
+<span class="block text-[10px] font-black text-on-surface-variant/40 mb-2">SAT</span>
+<div class="h-32 bg-surface-container-low rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high transition-colors border-b-4 border-transparent hover:border-primary-container/30">
+<span class="material-symbols-outlined text-sm opacity-40">bed</span>
+<span class="text-[10px] font-bold">Rest</span>
+</div>
+</div>
+<!-- Sun -->
+<div class="text-center group">
+<span class="block text-[10px] font-black text-primary mb-2">RACE</span>
+<div class="h-32 kinetic-gradient text-white rounded-lg flex flex-col items-center justify-center gap-2 shadow-lg scale-105">
+<span class="material-symbols-outlined text-lg" data-weight="fill">emoji_events</span>
+<span class="text-[10px] font-black">21.1KM</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Course Strategy -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Map Canvas -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden min-h-[320px] relative group">
+<img class="w-full h-full object-cover grayscale brightness-95" data-alt="Modern topographic map of a city marathon route with elevation contours and bright orange polyline marker" data-location="Valencia, Spain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJuW2SDEo-zHVgSGwDvPR9ODefUenm4KSueq-uXNxIf38yMjxIjyw8HWfSdJUZAHFj5dXPDrslcFq8I1Cs5NRrXMzadVE_DIPlAbeX3XKTvg-KTW3F_tL7dO8-mNeR5Npxl3Qpk495lQIvVEkiIV3XUE2OhnRoif-u649HUq5MVz-BM9ZgVASVFWcJ6A20bVu1AguPHtdC3MQDNdNCMuEAYcT2BXIsagUD4by1HUiBm16DyplNUXZ5GVCQz2wLBFgOYDL9WzfGdDs"/>
+<div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+<div class="absolute bottom-4 left-4 glass-hud p-4 rounded-lg flex gap-4 items-center">
+<div>
+<p class="text-[10px] font-black uppercase text-primary">Surface Type</p>
+<p class="text-sm font-bold">Asphalt / Flat</p>
+</div>
+<div class="w-px h-8 bg-on-surface/10"></div>
+<div>
+<p class="text-[10px] font-black uppercase text-primary">Avg Temp</p>
+<p class="text-sm font-bold">14°C / 57°F</p>
+</div>
+</div>
+</div>
+<!-- Elevation and Notes -->
+<div class="space-y-6">
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-surface-container-high">
+<h4 class="text-xs font-black tracking-widest uppercase text-on-surface-variant mb-4">Elevation Profile</h4>
+<div class="flex items-end gap-1 h-24 mb-4">
+<div class="bg-primary/20 w-full h-[10%] rounded-t-sm"></div>
+<div class="bg-primary/30 w-full h-[12%] rounded-t-sm"></div>
+<div class="bg-primary/40 w-full h-[15%] rounded-t-sm"></div>
+<div class="bg-primary w-full h-[35%] rounded-t-sm"></div>
+<div class="bg-primary/40 w-full h-[15%] rounded-t-sm"></div>
+<div class="bg-primary/30 w-full h-[10%] rounded-t-sm"></div>
+<div class="bg-primary/20 w-full h-[8%] rounded-t-sm"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold text-on-surface-variant">
+<span>START</span>
+<span>BRIDGE @ KM 12</span>
+<span>FINISH</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex items-start gap-4">
+<span class="material-symbols-outlined text-primary">priority_high</span>
+<div>
+<h4 class="font-bold text-sm mb-1">Strategic Note</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                                    The incline at KM 12 is minimal but sustained. Do not chase pace here; keep heart rate below 168bpm to save glycogen for the final 5km flat push.
+                                </p>
+</div>
+</div>
+<button class="w-full py-4 bg-on-surface text-white font-bold rounded-xl flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl">
+<span class="material-symbols-outlined">sync</span>
+                            Recalculate with Live Weather
+                        </button>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full glass-hud h-16 flex justify-around items-center px-4 z-50">
+<button class="flex flex-col items-center gap-1 text-zinc-500">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#a73400] font-bold">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="text-[10px]">Strategy</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-zinc-500">
+<div class="kinetic-gradient w-10 h-10 rounded-full flex items-center justify-center text-white mb-2 shadow-lg -mt-8">
+<span class="material-symbols-outlined">add</span>
+</div>
+</button>
+<button class="flex flex-col items-center gap-1 text-zinc-500">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px]">Log</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-zinc-500">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px]">Profile</span>
+</button>
+</nav>
+</body></html>
