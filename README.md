@@ -4,8 +4,6 @@
 
 **AI Running Coach powered by Notion MCP**
 
-Built for the [MLH x Notion MCP Challenge](https://mlh.io)
-
 ---
 
 ## What is PaceIQ?
@@ -121,7 +119,7 @@ Strava API ──► src/strava/   ──► Notion Databases ◄── src/noti
 - **LangChain / LangGraph** — ReAct agent with tool calling
 - **Notion API** — MCP-powered knowledge backend
 - **Strava API** — OAuth2 activity sync
-- **OpenRouter** — LLM provider (nvidia/nemotron-3-super-120b-a12b)
+- **OpenRouter** — LLM provider (stepfun/step-3.5-flash:free)
 - **Zod** — Runtime schema validation for tool inputs
 
 ## License
