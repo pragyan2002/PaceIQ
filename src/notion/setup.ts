@@ -12,7 +12,7 @@ if (!PARENT_PAGE_ID) {
 async function createRunsDatabase(parentPageId: string): Promise<string> {
   const response = await notionClient.databases.create({
     parent: { type: "page_id", page_id: parentPageId },
-    title: [{ type: "text", text: { content: "Runs" } }],
+    title: [{ type: "text", text: { content: "PaceIQ Runs" } }],
     properties: {
       Name: {
         title: {},
@@ -68,7 +68,7 @@ async function createTrainingLogDatabase(
 ): Promise<string> {
   const response = await notionClient.databases.create({
     parent: { type: "page_id", page_id: parentPageId },
-    title: [{ type: "text", text: { content: "Training Log" } }],
+    title: [{ type: "text", text: { content: "PaceIQ Training Log" } }],
     properties: {
       Name: {
         title: {},
@@ -112,7 +112,7 @@ async function createTrainingLogDatabase(
 async function createRacesDatabase(parentPageId: string): Promise<string> {
   const response = await notionClient.databases.create({
     parent: { type: "page_id", page_id: parentPageId },
-    title: [{ type: "text", text: { content: "Races" } }],
+    title: [{ type: "text", text: { content: "PaceIQ Races" } }],
     properties: {
       Name: {
         title: {},
@@ -160,7 +160,7 @@ async function createCoachSessionsDatabase(
 ): Promise<string> {
   const response = await notionClient.databases.create({
     parent: { type: "page_id", page_id: parentPageId },
-    title: [{ type: "text", text: { content: "Coach Sessions" } }],
+    title: [{ type: "text", text: { content: "PaceIQ Coach Sessions" } }],
     properties: {
       Name: {
         title: {},

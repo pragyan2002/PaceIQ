@@ -1,14 +1,15 @@
 import "dotenv/config";
-import { getSchema } from "./notion/schema.js";
+import { getSchemaAsync } from "./notion/schema.js";
 import { syncActivities } from "./strava/sync.js";
 import { startServer } from "./server/server.js";
 
 async function main() {
   try {
-    getSchema();
-  } catch {
+    await getSchemaAsync();
+  } catch (err) {
     console.error(
-      "Notion database IDs not found. Run 'npm run setup' first, then add the IDs to .env."
+      "Notion database discovery failed:",
+      err instanceof Error ? err.message : err
     );
     process.exit(1);
   }
