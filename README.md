@@ -1,6 +1,6 @@
 # PaceIQ
 
-![PaceIQ](PaceIQ%20logo.png)
+![PaceIQ](paceiq-logo.png)
 
 **AI Running Coach powered by Notion MCP**
 
