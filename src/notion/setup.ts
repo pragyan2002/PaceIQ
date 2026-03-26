@@ -198,6 +198,57 @@ async function createCoachSessionsDatabase(
   return response.id;
 }
 
+async function createWeeklyReportsDatabase(
+  parentPageId: string
+): Promise<string> {
+  const response = await notionClient.databases.create({
+    parent: { type: "page_id", page_id: parentPageId },
+    title: [{ type: "text", text: { content: "PaceIQ Weekly Reports" } }],
+    properties: {
+      Name: {
+        title: {},
+      },
+      Week: {
+        rich_text: {},
+      },
+      "Date Generated": {
+        date: {},
+      },
+      "Overtraining Risk": {
+        select: {
+          options: [
+            { name: "Low", color: "green" },
+            { name: "Moderate", color: "yellow" },
+            { name: "High", color: "orange" },
+            { name: "Critical", color: "red" },
+          ],
+        },
+      },
+      "Plateau Detected": {
+        checkbox: {},
+      },
+      "PR Ready": {
+        select: {
+          options: [
+            { name: "Not Ready", color: "gray" },
+            { name: "Maybe", color: "yellow" },
+            { name: "Yes - 5K", color: "green" },
+            { name: "Yes - 10K", color: "blue" },
+            { name: "Yes - Half", color: "purple" },
+          ],
+        },
+      },
+      "Weekly Mileage": {
+        number: { format: "number" },
+      },
+      "Report Page": {
+        url: {},
+      },
+    },
+  });
+  return response.id;
+}
+
 async function main() {
   console.log("🏃 PaceIQ Setup — Creating Notion databases...\n");
 
@@ -218,14 +269,19 @@ async function main() {
     const sessionsDbId = await createCoachSessionsDatabase(PARENT_PAGE_ID!);
     console.log(`✅ Coach Sessions database created: ${sessionsDbId}`);
 
+    console.log("Creating Weekly Reports database...");
+    const reportsDbId = await createWeeklyReportsDatabase(PARENT_PAGE_ID!);
+    console.log(`✅ Weekly Reports database created: ${reportsDbId}`);
+
     console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     console.log("Add these to your .env file:\n");
     console.log(`NOTION_RUNS_DB_ID=${runsDbId}`);
     console.log(`NOTION_LOG_DB_ID=${logDbId}`);
     console.log(`NOTION_RACES_DB_ID=${racesDbId}`);
     console.log(`NOTION_SESSIONS_DB_ID=${sessionsDbId}`);
+    console.log(`NOTION_REPORTS_DB_ID=${reportsDbId}`);
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-    console.log("Setup complete! Copy the IDs above into .env, then run: npm start");
+    console.log("Setup complete! With auto-discovery enabled, you can now run: npm start");
   } catch (error) {
     if (error instanceof Error) {
       console.error(`\n❌ Setup failed: ${error.message}`);

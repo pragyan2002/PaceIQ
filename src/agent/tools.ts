@@ -399,6 +399,386 @@ const getCoachingHistory = new DynamicStructuredTool({
   },
 });
 
+// ── Analysis Tools ──────────────────────────────────────────────────────────
+
+const detectOvertraining = new DynamicStructuredTool({
+  name: "detect_overtraining",
+  description:
+    "Analyze training data for overtraining risk. Checks mileage increase %, energy trends, injury frequency, and consecutive run days. Returns a risk level (Low/Moderate/High/Critical) with reasoning.",
+  schema: z.object({
+    weeks: z.number().default(4).describe("Number of weeks to analyze (default 4)"),
+  }),
+  func: async ({ weeks }) => {
+    const { runsDbId, logDbId } = getSchema();
+    const since = daysAgoISO(weeks * 7);
+
+    // Fetch runs
+    const runPages = await queryDatabase(
+      runsDbId,
+      { property: "Date", date: { on_or_after: since } },
+      [{ property: "Date", direction: "ascending" }]
+    );
+
+    // Fetch training log entries
+    const logPages = await queryDatabase(
+      logDbId,
+      { property: "Date", date: { on_or_after: since } },
+      [{ property: "Date", direction: "ascending" }]
+    );
+
+    // Group runs by week for mileage
+    const weekMap = new Map<string, number>();
+    const runDates: string[] = [];
+    for (const page of runPages as PageObjectResponse[]) {
+      const date = getDate(prop(page, "Date"));
+      if (!date) continue;
+      runDates.push(date);
+      const week = isoWeek(date);
+      const km = getNumber(prop(page, "Distance (km)"));
+      weekMap.set(week, (weekMap.get(week) ?? 0) + km);
+    }
+
+    // Week-over-week mileage increase
+    const weeklyTotals = Array.from(weekMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, km]) => km);
+
+    let weeklyIncreasePct = 0;
+    if (weeklyTotals.length >= 2) {
+      const prev = weeklyTotals[weeklyTotals.length - 2];
+      const curr = weeklyTotals[weeklyTotals.length - 1];
+      weeklyIncreasePct = prev > 0 ? Math.round(((curr - prev) / prev) * 100) : 0;
+    }
+
+    // Energy trend
+    const energyMap: Record<string, number> = {
+      High: 3, Normal: 2, Low: 1, Exhausted: 0,
+    };
+    let energySum = 0;
+    let energyCount = 0;
+    let injuryFlagCount = 0;
+
+    for (const page of logPages as PageObjectResponse[]) {
+      const energy = getSelect(prop(page, "Energy Level"));
+      if (energy && energy in energyMap) {
+        energySum += energyMap[energy];
+        energyCount++;
+      }
+      if (getCheckbox(prop(page, "Injury Flag"))) {
+        injuryFlagCount++;
+      }
+    }
+
+    const avgEnergy = energyCount > 0 ? Math.round((energySum / energyCount) * 10) / 10 : 2;
+
+    // Consecutive run days
+    const uniqueDates = [...new Set(runDates)].sort();
+    let maxConsecutive = 0;
+    let currentStreak = 1;
+    for (let i = 1; i < uniqueDates.length; i++) {
+      const prev = new Date(uniqueDates[i - 1]);
+      const curr = new Date(uniqueDates[i]);
+      const diffDays = Math.round((curr.getTime() - prev.getTime()) / 86400000);
+      if (diffDays === 1) {
+        currentStreak++;
+        maxConsecutive = Math.max(maxConsecutive, currentStreak);
+      } else {
+        currentStreak = 1;
+      }
+    }
+    maxConsecutive = Math.max(maxConsecutive, currentStreak);
+
+    // Score risk
+    let riskLevel: string;
+    const reasons: string[] = [];
+
+    if (weeklyIncreasePct > 30 || maxConsecutive > 7 || injuryFlagCount >= 2) {
+      riskLevel = "Critical";
+    } else if (weeklyIncreasePct > 20 || avgEnergy < 1.5 || maxConsecutive > 5) {
+      riskLevel = "High";
+    } else if (weeklyIncreasePct > 10 || avgEnergy < 2.0) {
+      riskLevel = "Moderate";
+    } else {
+      riskLevel = "Low";
+    }
+
+    if (weeklyIncreasePct > 10) reasons.push(`Mileage increase: +${weeklyIncreasePct}% week-over-week (threshold: 10%)`);
+    reasons.push(`Avg energy: ${avgEnergy}/3.0`);
+    reasons.push(`Consecutive run days: ${maxConsecutive}`);
+    reasons.push(`Injury flags in period: ${injuryFlagCount}`);
+
+    return JSON.stringify({
+      risk_level: riskLevel,
+      weekly_increase_pct: weeklyIncreasePct,
+      avg_energy: avgEnergy,
+      injury_flag_count: injuryFlagCount,
+      consecutive_run_days: maxConsecutive,
+      current_weekly_mileage: weeklyTotals.length > 0 ? Math.round(weeklyTotals[weeklyTotals.length - 1] * 100) / 100 : 0,
+      reasoning: reasons.join("; "),
+    });
+  },
+});
+
+const detectPlateau = new DynamicStructuredTool({
+  name: "detect_plateau",
+  description:
+    "Analyze pace and heart rate trends to detect performance plateaus. Uses linear regression on weekly averages. Returns plateau detection with diagnosis.",
+  schema: z.object({
+    weeks: z.number().default(6).describe("Number of weeks to analyze (default 6)"),
+  }),
+  func: async ({ weeks }) => {
+    const { runsDbId } = getSchema();
+    const since = daysAgoISO(weeks * 7);
+
+    const runPages = await queryDatabase(
+      runsDbId,
+      { property: "Date", date: { on_or_after: since } },
+      [{ property: "Date", direction: "ascending" }]
+    );
+
+    // Group by week: avg pace and avg HR
+    const weekData = new Map<string, { paces: number[]; hrs: number[] }>();
+
+    for (const page of runPages as PageObjectResponse[]) {
+      const date = getDate(prop(page, "Date"));
+      if (!date) continue;
+      const week = isoWeek(date);
+      const pace = getNumber(prop(page, "Avg Pace (min/km)"));
+      const hr = getNumber(prop(page, "Avg Heart Rate"));
+
+      if (!weekData.has(week)) weekData.set(week, { paces: [], hrs: [] });
+      const entry = weekData.get(week)!;
+      if (pace > 0) entry.paces.push(pace);
+      if (hr > 0) entry.hrs.push(hr);
+    }
+
+    const sortedWeeks = Array.from(weekData.entries())
+      .sort(([a], [b]) => a.localeCompare(b));
+
+    const weeklyPaces: number[] = [];
+    const weeklyHRs: number[] = [];
+
+    for (const [, data] of sortedWeeks) {
+      const avgPace = data.paces.length > 0
+        ? data.paces.reduce((a, b) => a + b, 0) / data.paces.length
+        : 0;
+      const avgHR = data.hrs.length > 0
+        ? data.hrs.reduce((a, b) => a + b, 0) / data.hrs.length
+        : 0;
+      weeklyPaces.push(avgPace);
+      weeklyHRs.push(avgHR);
+    }
+
+    // Simple least-squares linear regression slope
+    function linearSlope(values: number[]): number {
+      const n = values.length;
+      if (n < 2) return 0;
+      let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+      for (let i = 0; i < n; i++) {
+        sumX += i;
+        sumY += values[i];
+        sumXY += i * values[i];
+        sumXX += i * i;
+      }
+      const denom = n * sumXX - sumX * sumX;
+      return denom === 0 ? 0 : (n * sumXY - sumX * sumY) / denom;
+    }
+
+    const paceSlope = linearSlope(weeklyPaces); // min/km per week (negative = improving)
+    const hrSlope = linearSlope(weeklyHRs); // bpm per week
+
+    // Convert pace slope to sec/km per week for readability
+    const paceSlopeSec = Math.round(paceSlope * 60 * 10) / 10;
+    const hrSlopeRound = Math.round(hrSlope * 10) / 10;
+
+    // Plateau detection
+    let plateauDetected = false;
+    let diagnosis = "";
+
+    const paceImprovement = -paceSlopeSec; // positive = getting faster
+
+    if (paceImprovement < 0.5 && sortedWeeks.length >= 4) {
+      plateauDetected = true;
+      if (hrSlopeRound > 0) {
+        diagnosis = `Pace stagnating (${paceImprovement.toFixed(1)} sec/km improvement over ${sortedWeeks.length} weeks) while avg HR rising (+${hrSlopeRound} bpm/week) — reduce intensity, add one easy week`;
+      } else {
+        diagnosis = `Both pace and HR trending flat for ${sortedWeeks.length} weeks — consider adding variety: tempo runs, intervals, or hill work`;
+      }
+    } else {
+      diagnosis = `Pace improving at ${paceImprovement.toFixed(1)} sec/km per week — no plateau detected`;
+    }
+
+    return JSON.stringify({
+      plateau_detected: plateauDetected,
+      pace_trend_sec_per_km_per_week: paceSlopeSec,
+      hr_trend_bpm_per_week: hrSlopeRound,
+      weeks_analysed: sortedWeeks.length,
+      diagnosis,
+    });
+  },
+});
+
+const assessPrReadiness = new DynamicStructuredTool({
+  name: "assess_pr_readiness",
+  description:
+    "Assess readiness for personal record attempts at 5K, 10K, and Half Marathon distances. Checks mileage consistency, long runs, injury status, and energy levels.",
+  schema: z.object({}),
+  func: async () => {
+    const { runsDbId, logDbId } = getSchema();
+    const since8w = daysAgoISO(56); // 8 weeks
+    const since2w = daysAgoISO(14);
+    const since3w = daysAgoISO(21);
+
+    // Fetch runs (8 weeks)
+    const runPages = await queryDatabase(
+      runsDbId,
+      { property: "Date", date: { on_or_after: since8w } },
+      [{ property: "Date", direction: "ascending" }]
+    );
+
+    // Fetch recent injuries (3 weeks)
+    const injuryPages = await queryDatabase(
+      logDbId,
+      {
+        and: [
+          { property: "Date", date: { on_or_after: since3w } },
+          { property: "Injury Flag", checkbox: { equals: true } },
+        ],
+      }
+    );
+
+    // Fetch recent energy (2 weeks)
+    const energyPages = await queryDatabase(
+      logDbId,
+      { property: "Date", date: { on_or_after: since2w } },
+      [{ property: "Date", direction: "descending" }]
+    );
+
+    // Group runs by week
+    const weekMap = new Map<string, { total_km: number; long_run_km: number; has_tempo: boolean }>();
+    for (const page of runPages as PageObjectResponse[]) {
+      const date = getDate(prop(page, "Date"));
+      if (!date) continue;
+      const week = isoWeek(date);
+      const km = getNumber(prop(page, "Distance (km)"));
+      const runType = getSelect(prop(page, "Run Type"));
+
+      if (!weekMap.has(week)) weekMap.set(week, { total_km: 0, long_run_km: 0, has_tempo: false });
+      const entry = weekMap.get(week)!;
+      entry.total_km += km;
+      entry.long_run_km = Math.max(entry.long_run_km, km);
+      if (runType === "Tempo" || runType === "Interval") entry.has_tempo = true;
+    }
+
+    const sortedWeeks = Array.from(weekMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b));
+
+    const weeklyKms = sortedWeeks.map(([, d]) => d.total_km);
+    const maxLongRun = Math.max(...sortedWeeks.map(([, d]) => d.long_run_km), 0);
+
+    // Injuries in last 2 weeks
+    const recentInjuries2w = (injuryPages as PageObjectResponse[]).filter((p) => {
+      const d = getDate(prop(p, "Date"));
+      return d >= since2w;
+    }).length;
+
+    const recentInjuries3w = injuryPages.length;
+
+    // Average energy last 2 weeks
+    const energyMap: Record<string, number> = { High: 3, Normal: 2, Low: 1, Exhausted: 0 };
+    let energySum = 0;
+    let energyCount = 0;
+    for (const page of energyPages as PageObjectResponse[]) {
+      const energy = getSelect(prop(page, "Energy Level"));
+      if (energy && energy in energyMap) {
+        energySum += energyMap[energy];
+        energyCount++;
+      }
+    }
+    const avgEnergy = energyCount > 0 ? energySum / energyCount : 2;
+
+    // Count consecutive weeks at mileage thresholds
+    function consecutiveWeeksAbove(threshold: number): number {
+      let max = 0;
+      let current = 0;
+      for (const km of weeklyKms) {
+        if (km >= threshold) {
+          current++;
+          max = Math.max(max, current);
+        } else {
+          current = 0;
+        }
+      }
+      return max;
+    }
+
+    const assessments = [];
+
+    // 5K assessment
+    const has5kEffort = sortedWeeks.some(([, d]) => d.has_tempo);
+    const weeks25 = consecutiveWeeksAbove(25);
+    const ready5k = has5kEffort && weeks25 >= 3 && recentInjuries2w === 0 && avgEnergy >= 2;
+    assessments.push({
+      distance: "5K",
+      ready: ready5k ? "Yes" : weeks25 >= 2 ? "Maybe" : "Not Ready",
+      confidence: ready5k ? "High" : "Low",
+      blockers: [
+        ...(!has5kEffort ? ["No recent tempo/interval work"] : []),
+        ...(weeks25 < 3 ? [`Only ${weeks25} consecutive weeks at 25km+`] : []),
+        ...(recentInjuries2w > 0 ? [`${recentInjuries2w} injury flags in last 2 weeks`] : []),
+        ...(avgEnergy < 2 ? ["Energy below Normal"] : []),
+      ],
+      supporting_evidence: [
+        ...(has5kEffort ? ["Recent tempo/interval sessions"] : []),
+        ...(weeks25 >= 3 ? [`${weeks25} weeks at 25km+`] : []),
+        ...(recentInjuries2w === 0 ? ["No recent injuries"] : []),
+      ],
+    });
+
+    // 10K assessment
+    const weeks40 = consecutiveWeeksAbove(40);
+    const hasLong10k = sortedWeeks.slice(-3).some(([, d]) => d.long_run_km >= 8);
+    const ready10k = hasLong10k && weeks40 >= 3 && recentInjuries2w === 0;
+    assessments.push({
+      distance: "10K",
+      ready: ready10k ? "Yes" : (weeks40 >= 2 && hasLong10k) ? "Maybe" : "Not Ready",
+      confidence: ready10k ? "High" : "Medium",
+      blockers: [
+        ...(!hasLong10k ? ["No 8-12km run in last 3 weeks"] : []),
+        ...(weeks40 < 3 ? [`Only ${weeks40} consecutive weeks at 40km+`] : []),
+        ...(recentInjuries2w > 0 ? [`${recentInjuries2w} injury flags in last 2 weeks`] : []),
+      ],
+      supporting_evidence: [
+        ...(hasLong10k ? ["Recent 8km+ run"] : []),
+        ...(weeks40 >= 3 ? [`${weeks40} weeks at 40km+`] : []),
+        ...(recentInjuries2w === 0 ? ["No recent injuries"] : []),
+      ],
+    });
+
+    // Half Marathon assessment
+    const weeks50 = consecutiveWeeksAbove(50);
+    const hasLong16 = maxLongRun >= 16;
+    const readyHalf = hasLong16 && weeks50 >= 4 && recentInjuries3w === 0;
+    assessments.push({
+      distance: "Half Marathon",
+      ready: readyHalf ? "Yes" : (hasLong16 && weeks50 >= 2) ? "Maybe" : "Not Ready",
+      confidence: readyHalf ? "High" : "Low",
+      blockers: [
+        ...(!hasLong16 ? [`Long run peaked at ${Math.round(maxLongRun)}km (need 16km+)`] : []),
+        ...(weeks50 < 4 ? [`Only ${weeks50} consecutive weeks at 50km+`] : []),
+        ...(recentInjuries3w > 0 ? [`${recentInjuries3w} injury flags in last 3 weeks`] : []),
+      ],
+      supporting_evidence: [
+        ...(hasLong16 ? [`Long run: ${Math.round(maxLongRun)}km`] : []),
+        ...(weeks50 >= 4 ? [`${weeks50} weeks at 50km+`] : []),
+        ...(recentInjuries3w === 0 ? ["No injuries in 3 weeks"] : []),
+      ],
+    });
+
+    return JSON.stringify({ assessments });
+  },
+});
+
 export const tools = [
   getRecentRuns,
   getWeeklyMileage,
@@ -408,4 +788,7 @@ export const tools = [
   addLogEntry,
   saveCoachingSession,
   getCoachingHistory,
+  detectOvertraining,
+  detectPlateau,
+  assessPrReadiness,
 ];
