@@ -1,0 +1,24 @@
+name: Generate Weekly Report
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'    # every Monday at 6am UTC
+  workflow_dispatch:         # manual trigger for demo purposes
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm run report
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+          STRAVA_SYNC_DAYS: 7
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}

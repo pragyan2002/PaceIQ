@@ -8,6 +8,7 @@
     "setup": "node --loader ts-node/esm src/notion/setup.ts",
     "sync": "node --loader ts-node/esm src/strava/sync.ts",
     "start": "node --loader ts-node/esm src/index.ts",
+    "report": "node --loader ts-node/esm src/agent/weekly_report.ts",
     "build": "tsc"
   },
   "dependencies": {
