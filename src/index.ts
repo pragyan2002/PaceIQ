@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { getSchema } from "./notion/schema.js";
 import { syncActivities } from "./strava/sync.js";
-import { startCli } from "./cli.js";
+import { startServer } from "./server/server.js";
 
 async function main() {
   try {
@@ -17,7 +17,7 @@ async function main() {
     console.log("Syncing your runs from Strava...");
     await syncActivities();
     console.log("\nReady. Starting PaceIQ...\n");
-    startCli();
+    startServer();
   } catch (err) {
     console.error(
       "Startup failed:",

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PaceIQ | AI Coaching Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-secondary-fixed": "#390c00",
+          "surface-container-high": "#e8e8e8",
+          "tertiary-fixed-dim": "#a4c9ff",
+          "on-tertiary": "#ffffff",
+          "surface-dim": "#dadada",
+          "secondary-fixed-dim": "#ffb59c",
+          "surface-tint": "#ab3500",
+          "inverse-primary": "#ffb59d",
+          "primary-container": "#d14300",
+          "on-tertiary-fixed-variant": "#004883",
+          "on-error-container": "#93000a",
+          "surface-variant": "#e2e2e2",
+          "on-primary-fixed": "#390c00",
+          "inverse-on-surface": "#f1f1f1",
+          "tertiary": "#005da8",
+          "on-primary": "#ffffff",
+          "surface-container-low": "#f3f3f3",
+          "on-primary-fixed-variant": "#832700",
+          "secondary-container": "#fe6529",
+          "surface": "#f9f9f9",
+          "on-secondary": "#ffffff",
+          "on-primary-container": "#fffbff",
+          "on-secondary-container": "#591800",
+          "outline": "#907065",
+          "secondary-fixed": "#ffdbcf",
+          "background": "#f9f9f9",
+          "surface-bright": "#f9f9f9",
+          "outline-variant": "#e5beb2",
+          "on-surface": "#1a1c1c",
+          "on-surface-variant": "#5c4037",
+          "on-secondary-fixed-variant": "#822700",
+          "surface-container-highest": "#e2e2e2",
+          "secondary": "#ab3600",
+          "primary": "#a73400",
+          "on-background": "#1a1c1c",
+          "error": "#ba1a1a",
+          "surface-container": "#eeeeee",
+          "primary-fixed": "#ffdbd0",
+          "on-error": "#ffffff",
+          "primary-fixed-dim": "#ffb59d",
+          "on-tertiary-container": "#fdfcff",
+          "on-tertiary-fixed": "#001c39",
+          "inverse-surface": "#2f3131",
+          "surface-container-lowest": "#ffffff",
+          "error-container": "#ffdad6",
+          "tertiary-fixed": "#d4e3ff",
+          "tertiary-container": "#0076d2"
+        },
+        fontFamily: {
+          "headline": ["Inter"],
+          "body": ["Inter"],
+          "label": ["Inter"]
+        },
+        borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body { font-family: 'Inter', sans-serif; }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  @keyframes pulse-dot { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+  .thinking-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+  .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+  .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+  .markdown-content p { margin-bottom: 0.5rem; }
+  .markdown-content ul { list-style: disc; margin-left: 1.25rem; margin-bottom: 0.5rem; }
+  .markdown-content ol { list-style: decimal; margin-left: 1.25rem; margin-bottom: 0.5rem; }
+  .markdown-content strong { font-weight: 700; }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md flex justify-between items-center px-6 h-14">
+  <div class="text-xl font-bold tracking-tighter text-zinc-900">PaceIQ</div>
+  <nav class="hidden md:flex gap-8 items-center font-sans antialiased tracking-tight text-sm font-medium">
+    <a class="text-zinc-500 hover:bg-zinc-200/50 transition-colors px-2 py-1 rounded" href="#">Share</a>
+    <a class="text-[#a73400] font-bold px-2 py-1 rounded bg-zinc-100/50" href="#">Chat</a>
+    <a class="text-zinc-500 hover:bg-zinc-200/50 transition-colors px-2 py-1 rounded" href="#">Updates</a>
+  </nav>
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-zinc-600 cursor-pointer">star</span>
+    <span class="material-symbols-outlined text-zinc-600 cursor-pointer">more_vert</span>
+  </div>
+</header>
+
+<div class="flex min-h-screen pt-14">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full hidden md:flex flex-col py-8 w-64 bg-zinc-50 z-40">
+  <div class="px-6 mb-10">
+    <h1 class="text-lg font-black tracking-widest uppercase text-[#a73400]">PaceIQ</h1>
+    <p class="text-[10px] text-zinc-400 font-medium tracking-widest uppercase mt-1">AI Running Coach</p>
+  </div>
+  <nav class="flex-1 space-y-1">
+    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="#">
+      <span class="material-symbols-outlined">dashboard</span> Dashboard
+    </a>
+    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="#">
+      <span class="material-symbols-outlined">calendar_today</span> Training Log
+    </a>
+    <a class="flex items-center gap-3 px-6 py-2 text-[#a73400] font-bold border-r-4 border-[#a73400] bg-zinc-100 text-sm" href="#">
+      <span class="material-symbols-outlined">smart_toy</span> Coaching Chat
+    </a>
+    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="#">
+      <span class="material-symbols-outlined">emoji_events</span> Race Planner
+    </a>
+    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="#">
+      <span class="material-symbols-outlined">settings</span> Settings
+    </a>
+  </nav>
+  <div class="px-6 mt-auto">
+    <button id="syncBtn" class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-3 rounded-xl font-bold text-sm tracking-tight shadow-lg shadow-primary/10 hover:opacity-90 transition-all">
+      Sync Strava
+    </button>
+    <div class="flex gap-4 mt-6 text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
+      <a class="hover:text-primary transition-colors" href="#">Help</a>
+      <a class="hover:text-primary transition-colors" href="#">Privacy</a>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 flex flex-col h-[calc(100vh-3.5rem)]">
+  <!-- Chat Header -->
+  <div class="px-8 py-6 flex items-center justify-between bg-surface-container-low/50 backdrop-blur-sm sticky top-0 z-30">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center text-white shadow-xl shadow-primary/20">
+        <span class="text-2xl">🏃</span>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-on-surface">AI Coach Chat</h2>
+        <p class="text-xs font-medium text-on-surface-variant/70 uppercase tracking-widest">Powered by StepFun Flash</p>
+      </div>
+    </div>
+    <div class="hidden lg:flex gap-2">
+      <div class="px-3 py-1 bg-surface-container-highest rounded-full flex items-center gap-2 border border-outline-variant/10">
+        <div id="statusDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span id="statusText" class="text-[10px] font-bold text-on-surface-variant uppercase">Online</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Grid Layout -->
+  <div class="flex-1 flex overflow-hidden px-8 pb-8 gap-8">
+    <!-- Chat History Area -->
+    <div class="flex-1 flex flex-col bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden border border-outline-variant/10">
+      <div id="chatArea" class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar">
+        <!-- Welcome message -->
+        <div class="flex justify-center">
+          <span class="px-4 py-1 rounded-full bg-surface-container text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">PaceIQ Coach Session</span>
+        </div>
+        <div class="flex flex-col items-start group">
+          <div class="max-w-[85%] bg-primary-container text-on-primary-container rounded-2xl rounded-tl-none p-5 shadow-xl shadow-primary/10">
+            <p class="text-sm font-medium leading-relaxed">
+              Hey! I'm your AI running coach. I have access to your complete training history in Notion. Ask me anything about your runs, injuries, race readiness, or log your daily training.
+            </p>
+          </div>
+          <span class="mt-2 text-[10px] font-bold text-primary uppercase tracking-tighter px-1">AI Coach</span>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="p-6 bg-surface-container-lowest border-t border-outline-variant/10">
+        <form id="chatForm" class="relative flex items-center">
+          <input id="chatInput" class="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary/20 rounded-xl py-4 pl-6 pr-16 text-sm font-medium placeholder:text-zinc-400" placeholder="Ask your coach anything about your data..." type="text" autocomplete="off"/>
+          <button type="submit" id="sendBtn" class="absolute right-2 p-3 bg-[#FC5200] text-white rounded-lg flex items-center justify-center shadow-lg shadow-[#FC5200]/20 hover:scale-95 transition-all active:opacity-80">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+          </button>
+        </form>
+        <div class="mt-4 flex gap-4 overflow-x-auto hide-scrollbar">
+          <button class="quick-prompt whitespace-nowrap px-4 py-1.5 rounded-full bg-surface-container-high text-[10px] font-bold text-on-surface-variant hover:bg-primary hover:text-white transition-all">"How much did I run last week?"</button>
+          <button class="quick-prompt whitespace-nowrap px-4 py-1.5 rounded-full bg-surface-container-high text-[10px] font-bold text-on-surface-variant hover:bg-primary hover:text-white transition-all">"Am I overtraining?"</button>
+          <button class="quick-prompt whitespace-nowrap px-4 py-1.5 rounded-full bg-surface-container-high text-[10px] font-bold text-on-surface-variant hover:bg-primary hover:text-white transition-all">"Am I ready for a 10K PR?"</button>
+          <button class="quick-prompt whitespace-nowrap px-4 py-1.5 rounded-full bg-surface-container-high text-[10px] font-bold text-on-surface-variant hover:bg-primary hover:text-white transition-all">"Summarize this week's intensity"</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Context Sidebar -->
+    <aside class="hidden xl:flex flex-col w-80 gap-6">
+      <div class="space-y-4">
+        <h3 class="text-[11px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-4">Active Intelligence</h3>
+        <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border-l-4 border-primary/40 relative overflow-hidden group">
+          <div class="flex items-start gap-3 relative z-10">
+            <span class="material-symbols-outlined text-primary text-xl">database</span>
+            <div>
+              <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Connected</p>
+              <h4 class="text-sm font-bold text-on-surface">Notion Databases</h4>
+              <p class="text-[11px] text-on-surface-variant mt-1 leading-snug">Runs, Training Log, Races, Coach Sessions</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border-l-4 border-emerald-500/40 relative overflow-hidden group">
+          <div class="flex items-start gap-3 relative z-10">
+            <span class="material-symbols-outlined text-emerald-600 text-xl">sync</span>
+            <div>
+              <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Strava</p>
+              <h4 class="text-sm font-bold text-on-surface">Activity Sync</h4>
+              <p id="syncStatus" class="text-[11px] text-on-surface-variant mt-1 leading-snug">Auto-synced on startup</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool Calls Log -->
+      <div class="mt-4">
+        <h3 class="text-[11px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-4">Agent Activity</h3>
+        <div id="toolLog" class="space-y-2 max-h-64 overflow-y-auto hide-scrollbar">
+          <p class="text-[11px] text-zinc-400 italic">Tool calls will appear here...</p>
+        </div>
+      </div>
+
+      <!-- Performance Block -->
+      <div class="mt-auto bg-surface-container-high p-6 rounded-2xl relative overflow-hidden">
+        <div class="relative z-10">
+          <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.15em] mb-4">Session</p>
+          <div class="flex items-baseline gap-2">
+            <span id="questionCount" class="text-4xl font-black tracking-tighter text-on-surface">0</span>
+            <span class="text-sm font-bold text-primary">questions</span>
+          </div>
+          <p class="mt-3 text-[11px] text-on-surface-variant font-medium leading-relaxed">
+            Ask me about your training, injuries, or race readiness.
+          </p>
+        </div>
+        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+      </div>
+    </aside>
+  </div>
+</main>
+</div>
+
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 flex justify-around items-center h-16 shadow-2xl">
+  <button class="flex flex-col items-center gap-1 text-[#a73400] scale-110">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+    <span class="text-[10px] font-bold">Chat</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-zinc-400">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span class="text-[10px] font-bold">Home</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-zinc-400">
+    <span class="material-symbols-outlined">calendar_today</span>
+    <span class="text-[10px] font-bold">Log</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-zinc-400">
+    <span class="material-symbols-outlined">emoji_events</span>
+    <span class="text-[10px] font-bold">Race</span>
+  </button>
+</nav>
+
+<script>
+(function() {
+  const chatArea = document.getElementById('chatArea');
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const syncBtn = document.getElementById('syncBtn');
+  const toolLog = document.getElementById('toolLog');
+  const questionCount = document.getElementById('questionCount');
+  const syncStatus = document.getElementById('syncStatus');
+
+  let msgCount = 0;
+  let isStreaming = false;
+
+  function scrollToBottom() {
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  function addUserMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'flex flex-col items-end group';
+    div.innerHTML = `
+      <div class="max-w-[85%] bg-surface-container-high rounded-2xl rounded-tr-none p-5 text-on-surface-variant shadow-sm">
+        <p class="text-sm font-medium leading-relaxed">${escapeHtml(text)}</p>
+      </div>
+      <span class="mt-2 text-[10px] font-bold text-zinc-400 uppercase tracking-tighter px-1">Runner</span>
+    `;
+    chatArea.appendChild(div);
+    scrollToBottom();
+  }
+
+  function addThinkingIndicator() {
+    const div = document.createElement('div');
+    div.id = 'thinking';
+    div.className = 'flex flex-col items-start';
+    div.innerHTML = `
+      <div class="max-w-[85%] bg-primary-container text-on-primary-container rounded-2xl rounded-tl-none p-5 shadow-xl shadow-primary/10">
+        <div class="flex items-center gap-1.5">
+          <div class="w-2 h-2 rounded-full bg-on-primary-container/50 thinking-dot"></div>
+          <div class="w-2 h-2 rounded-full bg-on-primary-container/50 thinking-dot"></div>
+          <div class="w-2 h-2 rounded-full bg-on-primary-container/50 thinking-dot"></div>
+        </div>
+      </div>
+    `;
+    chatArea.appendChild(div);
+    scrollToBottom();
+  }
+
+  function removeThinking() {
+    const el = document.getElementById('thinking');
+    if (el) el.remove();
+  }
+
+  function addToolCallLine(text) {
+    // Add to sidebar log
+    const firstChild = toolLog.firstElementChild;
+    if (firstChild && firstChild.tagName === 'P' && firstChild.classList.contains('italic')) {
+      toolLog.innerHTML = '';
+    }
+    const logItem = document.createElement('div');
+    logItem.className = 'flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded-lg';
+    logItem.innerHTML = `
+      <span class="material-symbols-outlined text-[14px] text-primary">function</span>
+      <span class="text-[11px] text-on-surface-variant font-medium">${escapeHtml(text.replace('[PaceIQ thinking] → ', ''))}</span>
+    `;
+    toolLog.appendChild(logItem);
+    toolLog.scrollTop = toolLog.scrollHeight;
+
+    // Add to chat area as subtle line
+    const chatLine = document.createElement('div');
+    chatLine.className = 'tool-call-line flex items-center gap-4 py-1 opacity-60';
+    chatLine.innerHTML = `
+      <div class="h-[1px] flex-1 bg-outline-variant/30"></div>
+      <div class="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-widest italic">
+        <span class="material-symbols-outlined text-[14px]">search</span>
+        ${escapeHtml(text.replace('[PaceIQ thinking] → ', ''))}
+      </div>
+      <div class="h-[1px] flex-1 bg-outline-variant/30"></div>
+    `;
+    // Insert before thinking indicator
+    const thinking = document.getElementById('thinking');
+    if (thinking) {
+      chatArea.insertBefore(chatLine, thinking);
+    } else {
+      chatArea.appendChild(chatLine);
+    }
+    scrollToBottom();
+  }
+
+  function createAIBubble() {
+    const div = document.createElement('div');
+    div.className = 'flex flex-col items-start group';
+    div.innerHTML = `
+      <div class="ai-bubble max-w-[85%] bg-primary-container text-on-primary-container rounded-2xl rounded-tl-none p-5 shadow-xl shadow-primary/10">
+        <div class="markdown-content text-sm font-medium leading-relaxed"></div>
+      </div>
+      <div class="mt-2 flex items-center gap-3 px-1">
+        <span class="text-[10px] font-bold text-primary uppercase tracking-tighter">AI Coach</span>
+        <div class="flex gap-1">
+          <button class="copy-btn material-symbols-outlined text-[14px] text-zinc-400 hover:text-primary transition-colors">content_copy</button>
+        </div>
+      </div>
+    `;
+    chatArea.appendChild(div);
+
+    const copyBtn = div.querySelector('.copy-btn');
+    const content = div.querySelector('.markdown-content');
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(content.textContent || '');
+      copyBtn.textContent = 'check';
+      setTimeout(() => { copyBtn.textContent = 'content_copy'; }, 1500);
+    });
+
+    scrollToBottom();
+    return content;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function renderMarkdown(text) {
+    // Basic markdown: bold, lists, paragraphs
+    let html = escapeHtml(text);
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\n\n/g, '</p><p>');
+    html = html.replace(/\n- /g, '</p><ul><li>');
+    html = html.replace(/\n(\d+)\. /g, '</p><ol><li>');
+    html = '<p>' + html + '</p>';
+    return html;
+  }
+
+  async function sendMessage(question) {
+    if (isStreaming || !question.trim()) return;
+    isStreaming = true;
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+
+    msgCount++;
+    questionCount.textContent = msgCount;
+
+    addUserMessage(question);
+    addThinkingIndicator();
+
+    try {
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let tokens = '';
+      let bubbleEl = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr) continue;
+
+          try {
+            const data = JSON.parse(jsonStr);
+
+            if (data.tool_call) {
+              addToolCallLine(data.tool_call);
+            } else if (data.token) {
+              if (!bubbleEl) {
+                removeThinking();
+                bubbleEl = createAIBubble();
+              }
+              tokens += data.token;
+              bubbleEl.innerHTML = renderMarkdown(tokens);
+              scrollToBottom();
+            } else if (data.error) {
+              removeThinking();
+              if (!bubbleEl) bubbleEl = createAIBubble();
+              bubbleEl.innerHTML = `<p class="text-red-300">Error: ${escapeHtml(data.error)}</p>`;
+            } else if (data.done) {
+              // Stream complete
+            }
+          } catch (e) {
+            // Skip malformed JSON
+          }
+        }
+      }
+
+      if (!bubbleEl) {
+        removeThinking();
+        bubbleEl = createAIBubble();
+        bubbleEl.innerHTML = '<p>No response received. Please try again.</p>';
+      }
+    } catch (err) {
+      removeThinking();
+      const bubbleEl = createAIBubble();
+      bubbleEl.innerHTML = `<p class="text-red-300">Connection error: ${escapeHtml(err.message)}</p>`;
+    }
+
+    isStreaming = false;
+    chatInput.disabled = false;
+    sendBtn.disabled = false;
+    chatInput.focus();
+    scrollToBottom();
+  }
+
+  // Form submit
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const question = chatInput.value.trim();
+    if (question) {
+      chatInput.value = '';
+      sendMessage(question);
+    }
+  });
+
+  // Quick prompts
+  document.querySelectorAll('.quick-prompt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.textContent.replace(/^"|"$/g, '');
+      chatInput.value = text;
+      sendMessage(text);
+      chatInput.value = '';
+    });
+  });
+
+  // Sync button
+  syncBtn.addEventListener('click', async () => {
+    syncBtn.disabled = true;
+    syncBtn.textContent = 'Syncing...';
+    syncStatus.textContent = 'Syncing activities...';
+    try {
+      const res = await fetch('/sync', { method: 'POST' });
+      const data = await res.json();
+      syncStatus.textContent = data.message || 'Sync complete';
+      syncBtn.textContent = 'Sync Complete';
+      setTimeout(() => { syncBtn.textContent = 'Sync Strava'; syncBtn.disabled = false; }, 2000);
+    } catch (err) {
+      syncStatus.textContent = 'Sync failed';
+      syncBtn.textContent = 'Sync Strava';
+      syncBtn.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>
