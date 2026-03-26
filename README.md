@@ -4,8 +4,6 @@
 
 **AI Running Coach powered by Notion MCP**
 
-Built for the [MLH x Notion MCP Challenge](https://mlh.io)
-
 ---
 
 ## What is PaceIQ?
