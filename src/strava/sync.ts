@@ -1,7 +1,7 @@
 import { getAccessToken, getActivities } from "./client.js";
 import { queryDatabase, createPage } from "../notion/client.js";
 import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints.js";
-import { getSchema } from "../notion/schema.js";
+import { getSchema, getSchemaAsync } from "../notion/schema.js";
 import "dotenv/config";
 
 const SYNC_DAYS = parseInt(process.env.STRAVA_SYNC_DAYS || "30", 10);
@@ -91,7 +91,8 @@ export async function syncActivities(): Promise<void> {
 
 // Run directly via `npm run sync`
 if (process.argv[1]?.includes("sync")) {
-  syncActivities()
+  getSchemaAsync()
+    .then(() => syncActivities())
     .then(() => process.exit(0))
     .catch((err) => {
       console.error("❌ Sync failed:", err instanceof Error ? err.message : err);
