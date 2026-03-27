@@ -17,6 +17,7 @@ jobs:
       - run: npm run sync
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
           STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
           STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
           STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
