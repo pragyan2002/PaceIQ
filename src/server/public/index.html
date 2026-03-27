@@ -110,16 +110,16 @@
     <p class="text-[10px] text-zinc-400 font-medium tracking-widest uppercase mt-1">AI Running Coach</p>
   </div>
   <nav class="flex-1 space-y-1">
-    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="#">
+    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="/">
       <span class="material-symbols-outlined">dashboard</span> Dashboard
     </a>
-    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="#">
+    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="/training-log">
       <span class="material-symbols-outlined">calendar_today</span> Training Log
     </a>
-    <a class="flex items-center gap-3 px-6 py-2 text-[#a73400] font-bold border-r-4 border-[#a73400] bg-zinc-100 text-sm" href="#">
+    <a class="flex items-center gap-3 px-6 py-2 text-[#a73400] font-bold border-r-4 border-[#a73400] bg-zinc-100 text-sm" href="/chat">
       <span class="material-symbols-outlined">smart_toy</span> Coaching Chat
     </a>
-    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="#">
+    <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="/race-planner">
       <span class="material-symbols-outlined">emoji_events</span> Race Planner
     </a>
     <a class="flex items-center gap-3 px-6 py-2 text-zinc-600 hover:bg-zinc-200 transition-all text-sm font-medium" href="#">
@@ -249,22 +249,22 @@
 
 <!-- BottomNavBar (Mobile Only) -->
 <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 flex justify-around items-center h-16 shadow-2xl">
-  <button class="flex flex-col items-center gap-1 text-[#a73400] scale-110">
+  <a href="/chat" class="flex flex-col items-center gap-1 text-[#a73400] scale-110">
     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
     <span class="text-[10px] font-bold">Chat</span>
-  </button>
-  <button class="flex flex-col items-center gap-1 text-zinc-400">
+  </a>
+  <a href="/" class="flex flex-col items-center gap-1 text-zinc-400">
     <span class="material-symbols-outlined">dashboard</span>
     <span class="text-[10px] font-bold">Home</span>
-  </button>
-  <button class="flex flex-col items-center gap-1 text-zinc-400">
+  </a>
+  <a href="/training-log" class="flex flex-col items-center gap-1 text-zinc-400">
     <span class="material-symbols-outlined">calendar_today</span>
     <span class="text-[10px] font-bold">Log</span>
-  </button>
-  <button class="flex flex-col items-center gap-1 text-zinc-400">
+  </a>
+  <a href="/race-planner" class="flex flex-col items-center gap-1 text-zinc-400">
     <span class="material-symbols-outlined">emoji_events</span>
     <span class="text-[10px] font-bold">Race</span>
-  </button>
+  </a>
 </nav>
 
 <script>
