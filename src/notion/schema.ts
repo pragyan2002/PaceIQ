@@ -35,11 +35,11 @@ async function discoverDatabases(): Promise<NotionSchema> {
       const title =
         db.title?.map((t) => t.plain_text).join("").toLowerCase() ?? "";
 
-      if (title === "paceiq runs") dbMap.runsDbId = db.id;
-      else if (title === "paceiq training log") dbMap.logDbId = db.id;
-      else if (title === "paceiq races") dbMap.racesDbId = db.id;
-      else if (title === "paceiq coach sessions") dbMap.sessionsDbId = db.id;
-      else if (title === "paceiq weekly reports") dbMap.reportsDbId = db.id;
+      if (title === "paceiq runs" || title === "runs") dbMap.runsDbId = db.id;
+      else if (title === "paceiq training log" || title === "training log") dbMap.logDbId = db.id;
+      else if (title === "paceiq races" || title === "races") dbMap.racesDbId = db.id;
+      else if (title === "paceiq coach sessions" || title === "coach sessions") dbMap.sessionsDbId = db.id;
+      else if (title === "paceiq weekly reports" || title === "weekly reports") dbMap.reportsDbId = db.id;
     }
 
     cursor = response.has_more
@@ -48,10 +48,10 @@ async function discoverDatabases(): Promise<NotionSchema> {
   } while (cursor);
 
   const required: Array<[string, string]> = [
-    ["runsDbId", "PaceIQ Runs"],
-    ["logDbId", "PaceIQ Training Log"],
-    ["racesDbId", "PaceIQ Races"],
-    ["sessionsDbId", "PaceIQ Coach Sessions"],
+    ["runsDbId", "Runs"],
+    ["logDbId", "Training Log"],
+    ["racesDbId", "Races"],
+    ["sessionsDbId", "Coach Sessions"],
   ];
 
   for (const [key, name] of required) {
