@@ -1,0 +1,208 @@
+{
+  "name": "PaceIQ Notion Coach Chat",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "paceiq-coach",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook — Notion Button",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PACEIQ_SERVER_URL || 'http://localhost:3000' }}/notion-chat",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-notion-chat-secret",
+              "value": "={{ $env.PACEIQ_CHAT_SECRET }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "question",
+              "value": "={{ $json.query.question }}"
+            },
+            {
+              "name": "page_id",
+              "value": "={{ $json.query.page_id }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "http-paceiq",
+      "name": "Call PaceIQ /notion-chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "update",
+        "pageId": "={{ $json.page_id }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Response",
+              "richTextValue": "={{ $json.response }}"
+            },
+            {
+              "key": "Status",
+              "selectValue": "\u2705 Answered"
+            },
+            {
+              "key": "Insight Type",
+              "selectValue": "={{ $json.insight_type }}"
+            }
+          ]
+        }
+      },
+      "id": "notion-update",
+      "name": "Update Notion Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [720, 300],
+      "credentials": {
+        "notionApi": {
+          "id": "REPLACE_WITH_YOUR_NOTION_CREDENTIAL_ID",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, message: 'Response written to Notion' }) }}"
+      },
+      "id": "respond-ok",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "update",
+        "pageId": "={{ $('Webhook — Notion Button').json.query.page_id }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Response",
+              "richTextValue": "={{ $json.response || 'An error occurred — check PaceIQ server logs.' }}"
+            },
+            {
+              "key": "Status",
+              "selectValue": "\u274c Error"
+            }
+          ]
+        }
+      },
+      "id": "notion-error",
+      "name": "Update Notion (Error)",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [720, 500],
+      "credentials": {
+        "notionApi": {
+          "id": "REPLACE_WITH_YOUR_NOTION_CREDENTIAL_ID",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: false, error: 'Failed to get coaching response' }) }}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [960, 500]
+    }
+  ],
+  "connections": {
+    "Webhook — Notion Button": {
+      "main": [
+        [
+          {
+            "node": "Call PaceIQ /notion-chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call PaceIQ /notion-chat": {
+      "main": [
+        [
+          {
+            "node": "Update Notion Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Notion (Error)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Notion Page": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Notion (Error)": {
+      "main": [
+        [
+          {
+            "node": "Respond Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "PaceIQ"
+    }
+  ]
+}
