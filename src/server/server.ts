@@ -161,6 +161,51 @@ app.post("/sync", async (_req, res) => {
   }
 });
 
+// ── Notion Chat Endpoint (called by n8n) ─────────────────────────────────────
+app.post("/notion-chat", async (req, res) => {
+  const secret = process.env.NOTION_CHAT_SECRET;
+  if (secret && req.headers["x-notion-chat-secret"] !== secret) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const { question, page_id } = req.body as { question?: string; page_id?: string };
+
+  if (!question || typeof question !== "string" || question.trim().length === 0) {
+    res.status(400).json({ error: "Missing or empty question" });
+    return;
+  }
+
+  console.log(`[Notion Chat] page=${page_id} question="${question.slice(0, 80)}"`);
+
+  try {
+    const response = await ask(question.trim());
+
+    const lower = response.toLowerCase();
+    let insight_type = "General";
+    if (lower.includes("race") || lower.includes("pr") || lower.includes("personal record")) {
+      insight_type = "Race Readiness";
+    } else if (lower.includes("injur") || lower.includes("pain") || lower.includes("sore")) {
+      insight_type = "Injury Analysis";
+    } else if (lower.includes("mileage") || lower.includes("volume") || lower.includes("km") || lower.includes("weekly")) {
+      insight_type = "Volume Review";
+    } else if (lower.includes("plan") || lower.includes("training plan") || lower.includes("marathon") || lower.includes("goal")) {
+      insight_type = "Race Planning";
+    }
+
+    res.json({ ok: true, response, insight_type, page_id });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error(`[Notion Chat] Error: ${message}`);
+    res.status(500).json({
+      ok: false,
+      error: message,
+      response: `Sorry, I hit an error: ${message}. Check the PaceIQ server logs.`,
+      insight_type: "General",
+    });
+  }
+});
+
 export function startServer(): void {
   const PORT = parseInt(process.env.PORT || "3000", 10);
   app.listen(PORT, () => {
