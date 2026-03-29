@@ -21,6 +21,7 @@ Ask it anything about your running — weekly mileage trends, injury patterns, r
 - **Daily Logging** — Log sleep, energy, injuries, and notes directly from the CLI
 - **Coaching Memory** — Every coaching session is saved to Notion, so the agent remembers past advice and can reference it
 - **Data-Grounded Responses** — Every claim is backed by a tool call to your Notion data — no hallucinated stats
+- **Notion Coach Chat** — Ask your AI coach directly from Notion. Type a question in the Coach Chat database, click Ask Coach, and get a response written back in ~15 seconds — no terminal needed. Powered by n8n.
 
 ## Architecture
 
@@ -112,6 +113,17 @@ Strava API ──► src/strava/   ──► Notion Databases ◄── src/noti
 > My knee is sore again — has this happened before?
 > Log today: 7hrs sleep, energy high, no injuries
 ```
+
+### Notion Coach Chat (n8n)
+
+1. Add `NOTION_CHAT_SECRET=<any-random-string>` to your `.env`
+2. Import `n8n-paceiq-workflow.json` into n8n
+3. Set `PACEIQ_SERVER_URL` and `PACEIQ_CHAT_SECRET` in n8n environment variables
+4. Connect your Notion account in both Notion nodes
+5. Copy the webhook URL and paste it into the `Ask Coach 🏃` formula column in the **💬 PaceIQ Coach Chat** database
+6. Activate the workflow
+7. Start the server: `npm start`
+8. Open the Coach Chat database → type a question → click **🏃 Ask Coach →**
 
 ## Tech Stack
 
