@@ -2,15 +2,15 @@
 
 ![PaceIQ](paceiq-logo.png)
 
-**AI Running Coach powered by Notion MCP**
+**Notion-centered AI running coach backend powered by Notion MCP**
 
 ---
 
 ## What is PaceIQ?
 
-PaceIQ is an AI running coach that lives in your terminal. It syncs your Strava activities into Notion databases, then uses a LangChain ReAct agent to query your real training data and deliver grounded, data-driven coaching advice.
+PaceIQ is a backend service for AI running coaching workflows centered on Notion as the source of truth. It syncs Strava activities into Notion databases, then uses a LangChain ReAct agent to query real training data and deliver grounded, data-driven coaching advice through API endpoints.
 
-Ask it anything about your running — weekly mileage trends, injury patterns, race readiness — and it answers with your actual numbers, not generic advice.
+You can call PaceIQ from terminal workflows, n8n automations, or webhooks (for example from a Notion button). It is not a bundled web frontend product.
 
 ## Features
 
@@ -26,15 +26,20 @@ Ask it anything about your running — weekly mileage trends, injury patterns, r
 ## Architecture
 
 ```
-Strava API ──► src/strava/   ──► Notion Databases ◄── src/notion/
-                                       │
-                                       ▼
-                                 src/agent/
-                              (LangChain ReAct)
-                                       │
-                                       ▼
-                                   src/cli.ts
-                              (Terminal Interface)
+Strava API ──► src/strava/ ──► Notion Databases ◄── src/notion/
+                                      │
+                                      ▼
+                                src/agent/
+                             (LangChain ReAct)
+                                      │
+                        ┌─────────────┴─────────────┐
+                        ▼                           ▼
+                 src/server/server.ts          src/cli.ts
+                 (API: /notion-chat,          (Terminal
+                  /sync, /health)              interface)
+                        │
+                        ▼
+               n8n / webhooks / Notion button
 ```
 
 | Module | Purpose |
