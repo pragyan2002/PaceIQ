@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { ask } from "../agent/agent.js";
+import { classifyInsightType, saveCoachingSessionRecord } from "../agent/sessionPersistence.js";
 import { syncActivities } from "../strava/sync.js";
 
 const app = express();
@@ -42,21 +43,18 @@ app.post("/notion-chat", async (req, res) => {
   console.log(`[Notion Chat] page=${page_id} question="${question.slice(0, 80)}"`);
 
   try {
-    const response = await ask(question.trim());
+    const result = await ask(question.trim());
+    const insight_type = classifyInsightType(result.response);
 
-    const lower = response.toLowerCase();
-    let insight_type = "General";
-    if (lower.includes("race") || lower.includes("pr") || lower.includes("personal record")) {
-      insight_type = "Race Readiness";
-    } else if (lower.includes("injur") || lower.includes("pain") || lower.includes("sore")) {
-      insight_type = "Injury Analysis";
-    } else if (lower.includes("mileage") || lower.includes("volume") || lower.includes("km") || lower.includes("weekly")) {
-      insight_type = "Volume Review";
-    } else if (lower.includes("plan") || lower.includes("training plan") || lower.includes("marathon") || lower.includes("goal")) {
-      insight_type = "Race Planning";
-    }
+    await saveCoachingSessionRecord({
+      question: question.trim(),
+      response: result.response,
+      insightType: insight_type,
+      toolCalls: result.toolCalls,
+      sessionSource: "server",
+    });
 
-    res.json({ ok: true, response, insight_type, page_id });
+    res.json({ ok: true, response: result.response, insight_type, page_id });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error(`[Notion Chat] Error: ${message}`);

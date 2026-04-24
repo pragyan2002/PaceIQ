@@ -1,6 +1,7 @@
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
 import { queryDatabase, createPage } from "../notion/client.js";
+import { saveCoachingSessionRecord, type InsightType } from "./sessionPersistence.js";
 import { getSchema } from "../notion/schema.js";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints.js";
 
@@ -306,7 +307,7 @@ const addLogEntry = new DynamicStructuredTool({
 const saveCoachingSession = new DynamicStructuredTool({
   name: "save_coaching_session",
   description:
-    "Save the current coaching session to Notion. You MUST call this after every response you give, with your full response, the tools you called, and the insight type.",
+    "Save the current coaching session to Notion with response content, tools used, and insight type.",
   schema: z.object({
     question: z.string().describe("The user's original question"),
     response: z.string().describe("Your full coaching response"),
@@ -324,39 +325,16 @@ const saveCoachingSession = new DynamicStructuredTool({
       .describe("The category that best describes this coaching interaction"),
   }),
   func: async ({ question, response, tools_used, insight_type }) => {
-    const { sessionsDbId } = getSchema();
-
-    const today = new Date();
-    const dateLabel = today.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-    const isoDate = today.toISOString().split("T")[0];
-
-    // Notion rich_text has a 2000 char limit per block — truncate if needed
-    const truncate = (s: string, max = 2000) =>
-      s.length > max ? s.slice(0, max - 3) + "..." : s;
-
-    await createPage(sessionsDbId, {
-      Name: {
-        title: [{ text: { content: `Coaching Session — ${dateLabel}` } }],
-      },
-      Date: {
-        date: { start: isoDate },
-      },
-      Question: {
-        rich_text: [{ text: { content: truncate(question) } }],
-      },
-      Response: {
-        rich_text: [{ text: { content: truncate(response) } }],
-      },
-      "Tools Used": {
-        rich_text: [{ text: { content: tools_used.join(", ") } }],
-      },
-      "Insight Type": {
-        select: { name: insight_type },
-      },
+    await saveCoachingSessionRecord({
+      question,
+      response,
+      insightType: insight_type as InsightType,
+      toolCalls: tools_used.map((name) => ({
+        name,
+        node: "agent",
+        timestamp: new Date().toISOString(),
+      })),
+      sessionSource: "agent-tool",
     });
 
     return "Session saved to Notion.";
