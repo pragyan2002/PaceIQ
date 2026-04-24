@@ -3,6 +3,7 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { tools } from "./tools.js";
 import { SYSTEM_PROMPT } from "./prompts.js";
 import type { AIMessageChunk } from "@langchain/core/messages";
+import type { ToolCallAudit } from "./sessionPersistence.js";
 import "dotenv/config";
 
 if (!process.env.OPENROUTER_API_KEY) {
@@ -27,17 +28,23 @@ const agent = createReactAgent({
   prompt: SYSTEM_PROMPT,
 });
 
+export interface AskResult {
+  response: string;
+  toolCalls: ToolCallAudit[];
+}
+
 /**
- * Send a question to the PaceIQ agent and return the final response.
+ * Send a question to the PaceIQ agent and return final response + captured tool-call metadata.
  * Prints intermediate tool calls to console so the user can see the agent thinking.
  */
-export async function ask(question: string): Promise<string> {
+export async function ask(question: string): Promise<AskResult> {
   const stream = await agent.stream(
     { messages: [{ role: "user", content: question }] },
     { streamMode: "updates" }
   );
 
   let finalResponse = "";
+  const toolCalls: ToolCallAudit[] = [];
 
   for await (const chunk of stream) {
     // Iterate over all node outputs (agent, tools, etc.)
@@ -48,10 +55,17 @@ export async function ask(question: string): Promise<string> {
       for (const msg of messages) {
         const aiMsg = msg as AIMessageChunk;
 
-        // Print tool calls as thinking indicators
+        // Print and capture tool calls from actual runtime events
         if (aiMsg.tool_calls && aiMsg.tool_calls.length > 0) {
           for (const tc of aiMsg.tool_calls) {
             console.log(`  [PaceIQ thinking] → calling ${tc.name}...`);
+            toolCalls.push({
+              id: tc.id,
+              name: tc.name,
+              args: tc.args,
+              node: nodeName,
+              timestamp: new Date().toISOString(),
+            });
           }
         }
 
@@ -69,8 +83,11 @@ export async function ask(question: string): Promise<string> {
   }
 
   if (!finalResponse) {
-    return "I wasn't able to generate a response. Please try again.";
+    return {
+      response: "I wasn't able to generate a response. Please try again.",
+      toolCalls,
+    };
   }
 
-  return finalResponse;
+  return { response: finalResponse, toolCalls };
 }
