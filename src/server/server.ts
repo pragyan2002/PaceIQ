@@ -1,8 +1,7 @@
-import express from "express";
-import cors from "cors";
 import { ask } from "../agent/agent.js";
 import { classifyInsightType, saveCoachingSessionRecord } from "../agent/sessionPersistence.js";
 import { syncActivities } from "../strava/sync.js";
+import { createApp } from "./app.js";
 
 const app = express();
 app.use(cors());

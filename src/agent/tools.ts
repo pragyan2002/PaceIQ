@@ -4,6 +4,7 @@ import { queryDatabase, createPage } from "../notion/client.js";
 import { saveCoachingSessionRecord, type InsightType } from "./sessionPersistence.js";
 import { getSchema } from "../notion/schema.js";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints.js";
+import { isoWeek, linearSlope } from "./toolTransforms.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -46,24 +47,6 @@ function daysAgoISO(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() - days);
   return d.toISOString().split("T")[0];
-}
-
-function isoWeek(dateStr: string): string {
-  const d = new Date(dateStr);
-  // ISO week calculation
-  const jan4 = new Date(d.getFullYear(), 0, 4);
-  const dayOfYear =
-    Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 1).getTime()) / 86400000) + 1;
-  const weekDay = d.getDay() || 7; // Mon=1 ... Sun=7
-  const weekNum = Math.ceil((dayOfYear - weekDay + 10) / 7);
-  // Handle year boundary: if weekNum > 52 and it's January, it belongs to prev year's last week
-  const year =
-    weekNum === 1 && d.getMonth() === 11
-      ? d.getFullYear() + 1
-      : weekNum >= 52 && d.getMonth() === 0
-        ? d.getFullYear() - 1
-        : d.getFullYear();
-  return `${year}-W${String(weekNum).padStart(2, "0")}`;
 }
 
 // ── Tools ────────────────────────────────────────────────────────────────────
@@ -545,21 +528,6 @@ const detectPlateau = new DynamicStructuredTool({
         : 0;
       weeklyPaces.push(avgPace);
       weeklyHRs.push(avgHR);
-    }
-
-    // Simple least-squares linear regression slope
-    function linearSlope(values: number[]): number {
-      const n = values.length;
-      if (n < 2) return 0;
-      let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-      for (let i = 0; i < n; i++) {
-        sumX += i;
-        sumY += values[i];
-        sumXY += i * values[i];
-        sumXX += i * i;
-      }
-      const denom = n * sumXX - sumX * sumX;
-      return denom === 0 ? 0 : (n * sumXY - sumX * sumY) / denom;
     }
 
     const paceSlope = linearSlope(weeklyPaces); // min/km per week (negative = improving)
