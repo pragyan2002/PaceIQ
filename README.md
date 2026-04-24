@@ -62,73 +62,148 @@ Strava API ──► src/strava/ ──► Notion Databases ◄── src/notion
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+
-- A [Notion](https://www.notion.so/) account with an [integration](https://www.notion.so/my-integrations)
-- A [Strava](https://www.strava.com/) account with an [API application](https://www.strava.com/settings/api)
+- A [Notion](https://www.notion.so/) workspace where you can create/share pages
+- A Notion integration from [my-integrations](https://www.notion.so/my-integrations)
+- A [Strava](https://www.strava.com/) API application from [Strava settings](https://www.strava.com/settings/api)
 - An [OpenRouter](https://openrouter.ai/) API key
 
-### Setup
+### 1) Install
 
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/<your-username>/PaceIQ.git
-   cd PaceIQ
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   Fill in your API keys in `.env` — see `.env.example` for descriptions of each variable.
-
-4. **Create Notion databases**
-   ```bash
-   npm run setup
-   ```
-   This creates 4 databases under your Notion page. Copy the printed database IDs into your `.env` file.
-
-5. **Import Strava data**
-   ```bash
-   npm run sync
-   ```
-
-6. **Start the coach**
-   ```bash
-   npm start
-   ```
-
-### CLI Commands
-
-| Command | Action |
-|---------|--------|
-| `/sync` | Re-import Strava activities |
-| `/history` | View past coaching sessions |
-| `/help` | Show example questions |
-| `/quit` | Exit PaceIQ |
-
-### Example Questions
-
-```
-> How much have I run in the last 4 weeks?
-> Am I ready for my upcoming race?
-> My knee is sore again — has this happened before?
-> Log today: 7hrs sleep, energy high, no injuries
+```bash
+git clone https://github.com/<your-username>/PaceIQ.git
+cd PaceIQ
+npm install
+cp .env.example .env
 ```
 
-### Notion Coach Chat (n8n)
+### 2) Fill `.env` with required credentials
 
-1. Add `NOTION_CHAT_SECRET=<any-random-string>` to your `.env`
-2. Import `n8n-paceiq-workflow.json` into n8n
-3. Set `PACEIQ_SERVER_URL` and `PACEIQ_CHAT_SECRET` in n8n environment variables
-4. Connect your Notion account in both Notion nodes
-5. Copy the webhook URL and paste it into the `Ask Coach 🏃` formula column in the **💬 PaceIQ Coach Chat** database
-6. Activate the workflow
-7. Start the server: `npm start`
-8. Open the Coach Chat database → type a question → click **🏃 Ask Coach →**
+Update `.env` with at least:
+
+- `NOTION_API_KEY`
+- `NOTION_PARENT_PAGE_ID`
+- `OPENROUTER_API_KEY`
+- `STRAVA_CLIENT_ID`
+- `STRAVA_CLIENT_SECRET`
+- `STRAVA_REFRESH_TOKEN`
+
+`STRAVA_SYNC_DAYS` defaults to `30` if omitted.
+
+### 3) Run Notion DB setup (one-time)
+
+```bash
+npm run setup
+```
+
+Expected outcome:
+
+- The script creates **5 databases** under `NOTION_PARENT_PAGE_ID`:
+  - PaceIQ Runs
+  - PaceIQ Training Log
+  - PaceIQ Races
+  - PaceIQ Coach Sessions
+  - PaceIQ Weekly Reports
+- It prints environment variable lines you should copy back into `.env`:
+  - `NOTION_RUNS_DB_ID`
+  - `NOTION_LOG_DB_ID`
+  - `NOTION_RACES_DB_ID`
+  - `NOTION_SESSIONS_DB_ID`
+  - `NOTION_REPORTS_DB_ID`
+
+### 4) Optional: run a manual sync now
+
+```bash
+npm run sync
+```
+
+Expected outcome:
+
+- Strava activities from the last `STRAVA_SYNC_DAYS` days are imported to the Runs database.
+- Command exits without errors.
+
+### 5) Start PaceIQ API server
+
+```bash
+npm start
+```
+
+Expected startup outcome:
+
+- App validates Notion schema access.
+- App performs a startup sync.
+- App prints `PaceIQ running at http://localhost:3000` (or your `PORT`).
+
+### Scripts reference (current)
+
+| Command | What it does |
+|---------|---------------|
+| `npm run setup` | Creates/prints required Notion DB IDs |
+| `npm run sync` | Imports Strava activities into Notion |
+| `npm start` | Starts API server and does startup sync/report checks |
+| `npm run report` | Generates weekly report workflow |
+| `npm run build` | Type-check/compile TypeScript to `dist/` |
+
+### Test `/notion-chat`
+
+After `npm start` is running, use one of these:
+
+Without a secret header (only works if `NOTION_CHAT_SECRET` is unset):
+
+```bash
+curl -sS -X POST http://localhost:3000/notion-chat \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"How much did I run this week?","page_id":"manual-test"}'
+```
+
+With secret header (recommended):
+
+```bash
+curl -sS -X POST http://localhost:3000/notion-chat \
+  -H 'Content-Type: application/json' \
+  -H "X-Notion-Chat-Secret: ${NOTION_CHAT_SECRET}" \
+  -d '{"question":"How much did I run this week?","page_id":"manual-test"}'
+```
+
+Expected outcome:
+
+- HTTP 200 with JSON like `{ "ok": true, "response": "...", "insight_type": "...", "page_id": "manual-test" }`.
+- If secret is wrong/missing while server secret is set: HTTP 401.
+
+## Reviewer Quickstart (10 min)
+
+### Copy/paste setup
+
+```bash
+git clone https://github.com/<your-username>/PaceIQ.git
+cd PaceIQ
+npm install
+cp .env.example .env
+# fill required keys in .env
+npm run setup
+npm run sync
+npm start
+```
+
+In a second terminal (from repo root):
+
+```bash
+curl -sS http://localhost:3000/health
+curl -sS -X POST http://localhost:3000/sync -H 'Content-Type: application/json' -d '{}'
+curl -sS -X POST http://localhost:3000/notion-chat \
+  -H 'Content-Type: application/json' \
+  -H "X-Notion-Chat-Secret: ${NOTION_CHAT_SECRET}" \
+  -d '{"question":"Give me a short training check-in.","page_id":"reviewer-quickstart"}'
+```
+
+### Verification checklist
+
+- [ ] `npm run setup` created all 5 Notion databases and printed DB IDs.
+- [ ] `.env` contains all printed `NOTION_*_DB_ID` values.
+- [ ] `npm run sync` completed and runs appear in the **PaceIQ Runs** DB.
+- [ ] `GET /health` returns `{ "ok": true, "service": "paceiq-server" }`.
+- [ ] `POST /sync` returns `{ "success": true, "message": "Sync complete" }`.
+- [ ] `POST /notion-chat` returns `{ "ok": true, ... }` with a coach response.
+- [ ] If `NOTION_CHAT_SECRET` is set, missing/incorrect header correctly returns 401.
 
 ## Tech Stack
 

@@ -4,32 +4,23 @@ node_modules/
 # Build output
 dist/
 
-# Environment variables
+# Local environment files (keep template tracked)
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
-# IDE
+# TypeScript cache
+*.tsbuildinfo
+
+# Editor / OS files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS files
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# Debug / scratch files
-test-agent.ts
-test-tools.ts
-
-# Internal planning docs
-paceiq_build_plan.docx
-
-# TypeScript cache
-*.tsbuildinfo
 
 # npm debug logs
 npm-debug.log*
