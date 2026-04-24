@@ -3,7 +3,7 @@ export default [
     ignores: ["dist/**", "node_modules/**"],
   },
   {
-    files: ["**/*.js", ".github/workflows/*.yml"],
+    files: ["**/*.js", "**/*.cjs", "**/*.mjs"],
     rules: {
       "no-console": "off",
     },
