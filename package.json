@@ -10,8 +10,8 @@
     "start": "node --loader ts-node/esm src/index.ts",
     "report": "node --loader ts-node/esm src/agent/weekly_report.ts",
     "build": "tsc",
-    "lint": "npx --yes --package eslint@9.39.2 --package @eslint/js@9.39.2 --package typescript-eslint@8.46.2 --package eslint-config-prettier@10.1.8 eslint .",
-    "lint:fix": "npx --yes --package eslint@9.39.2 --package @eslint/js@9.39.2 --package typescript-eslint@8.46.2 --package eslint-config-prettier@10.1.8 eslint . --fix",
+    "lint": "npx --yes eslint@9.39.2 .",
+    "lint:fix": "npx --yes eslint@9.39.2 . --fix",
     "format": "npx --yes prettier@3.7.4 . --check",
     "typecheck": "tsc -p tsconfig.typecheck.json",
     "test": "node --test --loader ts-node/esm tests/**/*.test.ts"

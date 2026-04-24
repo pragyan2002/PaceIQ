@@ -1,16 +1,11 @@
-import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import eslintConfigPrettier from "eslint-config-prettier";
-
-export default tseslint.config(
-  { ignores: ["dist/**", "node_modules/**"] },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
-  eslintConfigPrettier,
+export default [
   {
-    files: ["**/*.ts"],
+    ignores: ["dist/**", "node_modules/**"],
+  },
+  {
+    files: ["**/*.js", ".github/workflows/*.yml"],
     rules: {
-      "no-console": "off"
-    }
-  }
-);
+      "no-console": "off",
+    },
+  },
+];
